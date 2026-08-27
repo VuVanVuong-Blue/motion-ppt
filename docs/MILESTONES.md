@@ -8,16 +8,18 @@ extend the dependency graph defined in [ARCHITECTURE.md](./ARCHITECTURE.md).
 ## ✅ Milestone 1 — Packages, Domain Model & PPTX Tool (implemented)
 
 ### Scope
+
 Create the monorepo package infrastructure, the pure core domain model, and a
 Tier 1 PPTX writer/reader built on PptxGenJS.
 
 ### Decisions (confirmed with the project owner)
-| Decision | Choice |
-|---|---|
-| Packages in scope | `@motion-ppt/shared`, `@motion-ppt/core`, `@motion-ppt/pptx` (animation/graphics/video deferred) |
-| PPTX tool | Tier 1 only — domain model ↔ PptxGenJS roundtrip; OOXML timing injection (Tier 2, ADR 0002) lands with the animation milestone |
-| Reader scope | Writer-subset roundtrip (text, image, shape, group flattening); unknown constructs skipped with warnings |
-| Build tooling | Plain `tsc -b` (composite, NodeNext, ESM), zero bundler dependencies |
+
+| Decision          | Choice                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Packages in scope | `@motion-ppt/shared`, `@motion-ppt/core`, `@motion-ppt/pptx` (animation/graphics/video deferred)                               |
+| PPTX tool         | Tier 1 only — domain model ↔ PptxGenJS roundtrip; OOXML timing injection (Tier 2, ADR 0002) lands with the animation milestone |
+| Reader scope      | Writer-subset roundtrip (text, image, shape, group flattening); unknown constructs skipped with warnings                       |
+| Build tooling     | Plain `tsc -b` (composite, NodeNext, ESM), zero bundler dependencies                                                           |
 
 ### Deliverables
 
@@ -40,6 +42,7 @@ Tier 1 PPTX writer/reader built on PptxGenJS.
   silently dropped.
 
 ### Verification (all green)
+
 - `pnpm build` — 3/3 packages.
 - `pnpm typecheck` — zero errors, including test files.
 - `pnpm test` — 79 tests: shared 23, core 30, pptx 26 (writer, reader,
@@ -50,6 +53,7 @@ Tier 1 PPTX writer/reader built on PptxGenJS.
   yields 0 warnings, write→read→write is idempotent.
 
 ### Known limitations (by design, tracked for later milestones)
+
 - **Groups** are flattened (translation + opacity); group rotation/scale
   produces a warning. Native OOXML groups (`p:grpSp`) are skipped on read.
 - **Reader parses only the writer's subset**: tables (`p:graphicFrame`),
@@ -70,6 +74,7 @@ Tier 1 PPTX writer/reader built on PptxGenJS.
 ## ✅ Milestone 2 — Animation Package (implemented)
 
 ### Scope
+
 `@motion-ppt/animation` — the Animation DSL, timing math, easing/spring
 physics and the effect registry that renderers (PPTX Tier 2, canvas, three)
 will consume.
@@ -98,6 +103,7 @@ will consume.
   validation via `@motion-ppt/core`.
 
 ### Verification
+
 - `pnpm typecheck` — zero errors (incl. tests).
 - `pnpm test` — 72 tests: easing 26, spring 9, validation 15, timeline 15,
   registry 7. Spring easings verified for settle bounds and overshoot;
@@ -105,12 +111,54 @@ will consume.
 
 ---
 
-## ⏳ Later milestones (not started)
+## ✅ Milestone 3 — PPTX Tier 2: Native OOXML Timing Injection (implemented)
 
-- **M3 — PPTX Tier 2**: OOXML `<p:timing>` injection (jszip + XML patching)
-  consuming the Animation DSL produced by M2; PowerPoint-native animations.
-- **M4 — Rendered assets & MCP server**: `@motion-ppt/graphics`, `@motion-ppt/video`,
-  `apps/mcp-server` tool endpoints, `apps/web`/`apps/worker`.
+### Scope
+
+Inject native PowerPoint `<p:timing>` node graphs into .pptx output for
+effects expressible in OOXML, consuming the Animation DSL from M2.
+
+### Deliverables
+
+- **`packages/pptx/src/timing/timing-xml.ts`** — builds the `<p:timing>` tree
+  (`tmRoot` → `mainSeq` → per-animation `p:par` with absolute-ms delays) and
+  maps effects to native behaviors: `p:animEffect` (fade/flash),
+  `p:animMotion` (slideIn/slideOut/movePath), `p:animScale` (zoom/pulse),
+  `p:animRot` (spin).
+- **`packages/pptx/src/timing/injector.ts`** — `TimingInjector` post-processes
+  the writer's .pptx via jszip; resolves element ids → `p:spTgt spid`
+  positionally (writer emission order == XML document order); skips
+  unsupported effects/strategies with warnings.
+- **`packages/pptx/src/writer/elements.ts`** — extracted `flattenSlideElements`
+  as the single shared emission order between writer and injector.
+- **`packages/pptx/src/facade.ts`** — `writeAnimatedPresentation()` one-call
+  facade returning `{ buffer, warnings }`.
+
+### Verification
+
+- `pnpm test` — 37 pptx tests including 11 timing tests.
+- `scratch/demo-animated.pptx` — 44 parts intact, all XML well-formed,
+  relationships resolve, read-back 0 warnings, native timings on both slides.
+
+### Known limitations
+
+- Auto-play sequencing only (no click triggers); parallel groups render as
+  same-delay siblings; `pulse` is one-directional.
+- Motion paths are relative (fractions of shape size).
+- Structural/schema validation only — a real PowerPoint slide-show check is
+  still recommended before production use.
+
+---
+
+## 🚧 Milestone 4 — Rendered Assets (in progress)
+
+- **✅ `@motion-ppt/graphics` (implemented)** — Canvas renderer and frame
+  playback for the `generatedAsset` strategy: pure per-effect visual-state
+  math, `frameStatesAt` timeline playback (active/settled/overlap/morph),
+  `SlideRenderer` (`renderStatic` / `renderFrame` → PNG), pixel-probe tests
+  (46 tests), and a frame demo. See [docs/GRAPHICS.md](./GRAPHICS.md).
+- **⏳ Planned** — `@motion-ppt/video` (frame → H.264/transparent video),
+  `apps/mcp-server` tool endpoints, `apps/web` / `apps/worker`.
 
 ---
 

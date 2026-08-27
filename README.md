@@ -27,7 +27,7 @@ editable PowerPoint object instead of flattened video.
 - 🎯 **Rich animation math** — 14 named easings, closed-form spring physics,
   stagger offsets (forward / reverse / center-out), and a capability-aware
   effect registry with strategy resolution.
-- 🧪 **162 unit tests** across 4 packages; `shared` and `core` carry zero
+- 🧪 **208 unit tests** across 5 packages; `shared` and `core` carry zero
   runtime dependencies.
 - 🤖 **Agent-ready** — standardized Skills (`skills/*/SKILL.md`), ADRs, and a
   documented MCP-server roadmap.
@@ -68,6 +68,7 @@ motion-ppt/
 │   ├── shared/      # Types, errors, math, unit conversions, type guards
 │   ├── core/        # Pure scene graph: Presentation / Slide / SlideElement
 │   ├── animation/   # Animation DSL, easing, springs, registry, timeline
+│   ├── graphics/    # Canvas renderer & animation frame playback (generated assets)
 │   └── pptx/        # PptxGenJS writer, OOXML reader, native timing injector
 ├── apps/            # (planned) web · mcp-server · worker
 ├── skills/          # Standardized agent skills (SKILL.md)
@@ -75,12 +76,13 @@ motion-ppt/
 └── AGENTS.md        # Master rules for AI agents
 ```
 
-| Package                 | Purpose                                                                | Depends on                    |
-| ----------------------- | ---------------------------------------------------------------------- | ----------------------------- |
-| `@motion-ppt/shared`    | Types, errors, math, units, guards                                     | —                             |
-| `@motion-ppt/core`      | Presentation / Slide / SlideElement scene graph, validation, mutations | `shared`                      |
-| `@motion-ppt/animation` | Animation DSL, easing, springs, effect registry, `computeTimeline`     | `shared`, `core`              |
-| `@motion-ppt/pptx`      | PptxGenJS writer, OOXML reader, native `<p:timing>` injection          | `shared`, `core`, `animation` |
+| Package                 | Purpose                                                                         | Depends on                    |
+| ----------------------- | ------------------------------------------------------------------------------- | ----------------------------- |
+| `@motion-ppt/shared`    | Types, errors, math, units, guards                                              | —                             |
+| `@motion-ppt/core`      | Presentation / Slide / SlideElement scene graph, validation, mutations          | `shared`                      |
+| `@motion-ppt/animation` | Animation DSL, easing, springs, effect registry, `computeTimeline`              | `shared`, `core`              |
+| `@motion-ppt/graphics`  | Canvas renderer, per-effect visual states, timeline frame playback (PNG frames) | `shared`, `core`, `animation` |
+| `@motion-ppt/pptx`      | PptxGenJS writer, OOXML reader, native `<p:timing>` injection                   | `shared`, `core`, `animation` |
 
 ---
 
@@ -92,7 +94,7 @@ motion-ppt/
 pnpm install
 pnpm build       # tsc -b across all packages
 pnpm typecheck   # strict, including tests
-pnpm test        # 162 unit tests (vitest)
+pnpm test        # 208 unit tests (vitest)
 ```
 
 ### Generate the demo deck
@@ -101,6 +103,9 @@ pnpm test        # 162 unit tests (vitest)
 pnpm --filter @motion-ppt/pptx demo
 # -> scratch/demo.pptx          static deck (text, shapes, images, groups)
 # -> scratch/demo-animated.pptx same deck with native PowerPoint timings injected
+
+pnpm --filter @motion-ppt/graphics demo
+# -> scratch/graphics/*.png     static + animated frames of the same deck
 ```
 
 ---
@@ -176,6 +181,7 @@ const { buffer, warnings } = await writeAnimatedPresentation(deck, [plan]);
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)             | System design & pipeline specification                 |
 | [docs/ANIMATION-DSL-SPEC.md](./docs/ANIMATION-DSL-SPEC.md) | Formal Animation DSL schema                            |
 | [docs/TIMING-ENGINE.md](./docs/TIMING-ENGINE.md)           | OOXML timing injection (Tier 2) internals              |
+| [docs/GRAPHICS.md](./docs/GRAPHICS.md)                     | Canvas renderer & frame playback (generated assets)    |
 | [docs/TESTING.md](./docs/TESTING.md)                       | Test strategy & coverage                               |
 | [docs/WORKFLOW.md](./docs/WORKFLOW.md)                     | Git branching & PR process (target `dev`)              |
 | [docs/CI-CD.md](./docs/CI-CD.md)                           | CI/CD & configuration setup                            |
