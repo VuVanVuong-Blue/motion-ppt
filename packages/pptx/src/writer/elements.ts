@@ -1,8 +1,8 @@
 import type {
   AssetReference,
-  GroupElement,
   ImageElement,
   ShapeElement,
+  Slide,
   SlideElement,
   TextElement,
 } from '@motion-ppt/core';
@@ -27,9 +27,7 @@ export function writeElement(pslide: PptxSlide, element: SlideElement, ctx: Writ
     case 'image':
       writeImage(pslide, element, ctx);
       break;
-    case 'group':
-      writeGroup(pslide, element, ctx);
-      break;
+
     case 'asset_overlay':
       ctx.warnings.push(
         `Element "${element.id}" is an asset overlay; rendered assets arrive with the renderer milestone, skipped.`,
@@ -237,30 +235,55 @@ function writeImage(pslide: PptxSlide, element: ImageElement, ctx: WriteContext)
   pslide.addImage(options);
 }
 
-function writeGroup(pslide: PptxSlide, element: GroupElement, ctx: WriteContext): void {
-  const { transform: t, children } = element;
-  if (t.rotation || t.scaleX !== undefined || t.scaleY !== undefined) {
-    ctx.warnings.push(
-      `Group "${element.id}" has rotation/scale; the M1 writer flattens groups with translation and opacity only.`,
-    );
-  }
-  if (children.length === 0) {
-    ctx.warnings.push(`Group "${element.id}" has no children; skipped.`);
-    return;
-  }
-  const parentOpacity = t.opacity ?? 1;
-  for (const child of children) {
-    const opacity = (child.transform.opacity ?? 1) * parentOpacity;
-    const flattened: SlideElement = {
-      ...child,
-      transform: {
-        ...child.transform,
-        x: child.transform.x + t.x,
-        y: child.transform.y + t.y,
-        ...(opacity !== 1 ? { opacity } : {}),
-      },
-    };
-    writeElement(pslide, flattened, ctx);
-  }
+/**
+ * Flattens a slide into the exact element list the writer emits (z-order,
+ * groups expanded with translation + opacity, unsupported elements skipped
+ * with warnings). Shared with the timing injector so that OOXML shape ids
+ * (spids) can be resolved positionally.
+ */
+export function flattenSlideElements(
+  slide: Slide,
+  assets: ReadonlyMap<string, AssetReference>,
+  warnings: string[],
+): SlideElement[] {
+  const out: SlideElement[] = [];
+  const walk = (elements: readonly SlideElement[], baseX: number, baseY: number, parentOpacity: number): void => {
+    for (const element of elements) {
+      const x = element.transform.x + baseX;
+      const y = element.transform.y + baseY;
+      const opacity = (element.transform.opacity ?? 1) * parentOpacity;
+      if (element.type === 'group') {
+        if (element.transform.rotation || element.transform.scaleX !== undefined || element.transform.scaleY !== undefined) {
+          warnings.push(
+            `Group "${element.id}" has rotation/scale; the M1 writer flattens groups with translation and opacity only.`,
+          );
+        }
+        if (element.children.length === 0) {
+          warnings.push(`Group "${element.id}" has no children; skipped.`);
+          continue;
+        }
+        walk(element.children, x, y, opacity);
+        continue;
+      }
+      if (element.type === 'asset_overlay') {
+        warnings.push(
+          `Element "${element.id}" is an asset overlay; rendered assets arrive with the renderer milestone, skipped.`,
+        );
+        continue;
+      }
+      if (element.type === 'image' && !assets.has(element.content.sourceId)) {
+        warnings.push(
+          `Image element "${element.id}" references missing asset "${element.content.sourceId}"; skipped.`,
+        );
+        continue;
+      }
+      out.push({
+        ...element,
+        transform: { ...element.transform, x, y, ...(opacity !== 1 ? { opacity } : {}) },
+      });
+    }
+  };
+  walk(slide.elements, 0, 0, 1);
+  return out;
 }
 
