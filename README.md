@@ -157,19 +157,6 @@ const { buffer, warnings } = await writeAnimatedPresentation(deck, [plan]);
 
 ---
 
-## 🗺 Roadmap
-
-| Milestone | Scope                                                                                            | Status     |
-| --------- | ------------------------------------------------------------------------------------------------ | ---------- |
-| **M1**    | Monorepo packages, pure domain model, Tier 1 PPTX writer/reader (PptxGenJS roundtrip)            | ✅ Done    |
-| **M2**    | `@motion-ppt/animation`: DSL validation, easing & spring physics, effect registry, timeline math | ✅ Done    |
-| **M3**    | PPTX Tier 2: native OOXML `<p:timing>` injection (auto-play sequencing)                          | ✅ Done    |
-| **M4**    | `@motion-ppt/graphics` & `@motion-ppt/video` renderers, MCP server, web/worker apps              | ⏳ Planned |
-
-Details, decisions, and known limitations: [docs/MILESTONES.md](./docs/MILESTONES.md).
-
----
-
 ## 🤝 Team Workflow & CI/CD
 
 - **Branches & PRs:** all PRs target `dev`; `main` receives code only via
