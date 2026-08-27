@@ -1,0 +1,6 @@
+# Motion PPT Windsurf AI Rules
+- Read AGENTS.md before making any code modifications.
+- Maintain clean boundaries between packages/core, packages/animation, and packages/pptx.
+- Follow the 4-tier strategy: Native PPTX > Composite PPTX > Generated Asset > Rendered Asset.
+- Emit structured AnimationPlans via the Animation DSL instead of modifying raw XML directly.
+- Check skills/ for aesthetic guidance, timing rules, and stagger calculations.

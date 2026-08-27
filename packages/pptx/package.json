@@ -1,0 +1,37 @@
+{
+  "name": "@motion-ppt/pptx",
+  "version": "0.1.0",
+  "description": "PptxGenJS-based writer and OOXML reader for the Motion PPT domain model",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf dist *.tsbuildinfo",
+    "typecheck": "tsc -b --force && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run",
+    "demo": "node scripts/demo.mjs"
+  },
+  "engines": { "node": ">=20.0.0" },
+  "dependencies": {
+    "@motion-ppt/core": "workspace:*",
+    "@motion-ppt/shared": "workspace:*",
+    "fast-xml-parser": "^4.5.0",
+    "jszip": "^3.10.1",
+    "pptxgenjs": "^3.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  }
+}

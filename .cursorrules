@@ -1,0 +1,19 @@
+# Motion PPT Cursor Rules
+# Always adhere to AGENTS.md and docs/ARCHITECTURE.md.
+
+## Core Philosophy: Editable-First
+1. Prioritize PowerPoint native & composite animations over rasterized/rendered video.
+2. Text, cards, and shapes must remain 100% editable in PowerPoint unless explicitly instructed as a 3D/shader effect.
+
+## Monorepo Dependency Rules
+- @motion-ppt/shared: Zero internal dependencies.
+- @motion-ppt/core: Pure domain model & scene graph. NEVER import Three.js, React, or MCP here.
+- @motion-ppt/animation: Timeline, Easing, Effect Registry, and Animation DSL.
+- @motion-ppt/pptx: PptxGenJS + OOXML Timing Patch Engine.
+- apps/mcp-server: MCP Tools exposing domain operations to AI agents.
+
+## Code Standards
+- Strict TypeScript: No 'any'. Use 'unknown' with narrowing.
+- All new effects must implement EffectDefinition and register in EffectRegistry.
+- Animation plans must adhere to docs/ANIMATION-DSL-SPEC.md.
+- Consult skills/ directory before writing animation logic.
