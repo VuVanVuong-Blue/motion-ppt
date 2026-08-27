@@ -114,6 +114,7 @@ pnpm --filter @motion-ppt/pptx demo
 - [docs/DEFINITION-OF-DONE.md](./docs/DEFINITION-OF-DONE.md) — Quality verification checklist
 - [docs/WORKFLOW.md](./docs/WORKFLOW.md) — Git branching & PR process (target `dev`)
 - [docs/CI-CD.md](./docs/CI-CD.md) — CI/CD & configuration setup
+- [docs/TIMING-ENGINE.md](./docs/TIMING-ENGINE.md) — OOXML timing injection (Tier 2)
 - [docs/MILESTONES.md](./docs/MILESTONES.md) — Milestone scope & status
 - [skills/](./skills/) — Skill knowledge base for Agents
 

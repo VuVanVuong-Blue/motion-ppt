@@ -67,6 +67,9 @@ importers:
 
   packages/pptx:
     dependencies:
+      '@motion-ppt/animation':
+        specifier: workspace:*
+        version: link:../animation
       '@motion-ppt/core':
         specifier: workspace:*
         version: link:../core
