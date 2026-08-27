@@ -92,8 +92,18 @@ pnpm --filter @motion-ppt/pptx demo
   Tier 1 PPTX writer & reader (PptxGenJS roundtrip). See
   [docs/MILESTONES.md](./docs/MILESTONES.md) for scope, decisions and known
   limitations.
-- **M2+ (planned)** — Animation DSL & timeline, PPTX OOXML timing injection
-  (native animations), graphics/video renderers, MCP server.
+- **M2 (done)** — `@motion-ppt/animation`: Animation DSL validation, easing &
+  spring physics, effect registry with capability flags, timeline & stagger
+  math (72 tests).
+- **M3+ (planned)** — PPTX OOXML timing injection (native animations),
+  graphics/video renderers, MCP server.
+
+## 🛠 Team Process
+
+- **Git workflow**: all PRs target the `dev` branch; `main` only receives
+  code via release PRs — see [docs/WORKFLOW.md](./docs/WORKFLOW.md).
+- **CI/CD**: typecheck + build + test gates on every PR/push —
+  see [docs/CI-CD.md](./docs/CI-CD.md) and `.github/workflows/ci.yml`.
 
 ---
 
@@ -102,6 +112,9 @@ pnpm --filter @motion-ppt/pptx demo
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — System design & pipeline specification
 - [docs/ANIMATION-DSL-SPEC.md](./docs/ANIMATION-DSL-SPEC.md) — Formal Animation DSL schema
 - [docs/DEFINITION-OF-DONE.md](./docs/DEFINITION-OF-DONE.md) — Quality verification checklist
+- [docs/WORKFLOW.md](./docs/WORKFLOW.md) — Git branching & PR process (target `dev`)
+- [docs/CI-CD.md](./docs/CI-CD.md) — CI/CD & configuration setup
+- [docs/MILESTONES.md](./docs/MILESTONES.md) — Milestone scope & status
 - [skills/](./skills/) — Skill knowledge base for Agents
 
 ---
