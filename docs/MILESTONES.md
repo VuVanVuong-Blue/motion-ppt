@@ -67,11 +67,56 @@ Tier 1 PPTX writer/reader built on PptxGenJS.
 
 ---
 
+## ✅ Milestone 2 — Animation Package (implemented)
+
+### Scope
+`@motion-ppt/animation` — the Animation DSL, timing math, easing/spring
+physics and the effect registry that renderers (PPTX Tier 2, canvas, three)
+will consume.
+
+### Deliverables
+
+- **DSL types** (`src/types.ts`) — `AnimationPlan`, `AnimationItem`, easing
+  types, spring presets/config, stagger/morph/options and strategy enums per
+  `docs/ANIMATION-DSL-SPEC.md`.
+- **Validation** (`src/validate.ts`) — `parseAnimationPlan` consumes `unknown`
+  and throws path-aware `InvalidAnimationPlanError` (version, targets, timing,
+  easing, bezier, spring, stagger, morph, strategy checks).
+- **Easing** (`src/easing.ts`) — 14 named easings (linear, quad/cubic,
+  back overshoot, Material 3 emphasized/decelerate, Apple fluid, cinematic)
+  plus `resolveEasing('spring')`; boundaries f(0)=0, f(1)=1 verified by tests.
+- **Spring physics** (`src/spring.ts`) — closed-form damped oscillator with
+  presets (snappy/default/gentle/bouncy/cinematicHeavy), config merging,
+  settle time and displacement functions.
+- **Effect registry** (`src/registry.ts`) — `EffectDefinition` with
+  capability flags (pptxNative / pptxComposite / canvas / three) and
+  editable-first strategy resolution (native > composite > generatedAsset >
+  renderedAsset); 15 built-in effects.
+- **Timeline** (`src/timeline.ts`) — `computeTimeline` resolves per-target
+  absolute start/end with stagger offsets (forward/reverse/center_out),
+  default easing `easeOutCubic`, strategy, and optional slide target
+  validation via `@motion-ppt/core`.
+
+### Verification
+- `pnpm typecheck` — zero errors (incl. tests).
+- `pnpm test` — 72 tests: easing 26, spring 9, validation 15, timeline 15,
+  registry 7. Spring easings verified for settle bounds and overshoot;
+  stagger offsets verified for all three modes.
+
+---
+
 ## ⏳ Later milestones (not started)
 
-- **M2 — Animation package**: Animation DSL (per `docs/ANIMATION-DSL-SPEC.md`),
-  Timeline/Easing math, EffectRegistry with capability flags.
 - **M3 — PPTX Tier 2**: OOXML `<p:timing>` injection (jszip + XML patching)
-  consuming the DSL; PowerPoint-native animations.
+  consuming the Animation DSL produced by M2; PowerPoint-native animations.
 - **M4 — Rendered assets & MCP server**: `@motion-ppt/graphics`, `@motion-ppt/video`,
   `apps/mcp-server` tool endpoints, `apps/web`/`apps/worker`.
+
+---
+
+## 🛠 Repo process (added with M2)
+
+- Branching & PRs: `docs/WORKFLOW.md` — all PRs target `dev`; `main` receives
+  code only via release PRs from `dev`.
+- CI/CD & configuration: `docs/CI-CD.md` + `.github/workflows/ci.yml` — the
+  same gates CI enforces (typecheck, build, test).
