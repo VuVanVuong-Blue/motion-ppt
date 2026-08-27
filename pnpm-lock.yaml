@@ -24,6 +24,28 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/animation:
+    dependencies:
+      '@motion-ppt/core':
+        specifier: workspace:*
+        version: link:../core
+      '@motion-ppt/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.1
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)
+
   packages/core:
     dependencies:
       '@motion-ppt/shared':
@@ -45,6 +67,9 @@ importers:
 
   packages/pptx:
     dependencies:
+      '@motion-ppt/animation':
+        specifier: workspace:*
+        version: link:../animation
       '@motion-ppt/core':
         specifier: workspace:*
         version: link:../core

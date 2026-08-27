@@ -1,7 +1,7 @@
 {
-  "name": "@motion-ppt/pptx",
+  "name": "@motion-ppt/animation",
   "version": "0.1.0",
-  "description": "PptxGenJS-based writer and OOXML reader for the Motion PPT domain model",
+  "description": "Animation DSL, timeline math, easing functions and effect registry",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,17 +17,12 @@
     "build": "tsc -b",
     "clean": "rimraf dist *.tsbuildinfo",
     "typecheck": "tsc -b --force && tsc -p tsconfig.test.json --noEmit",
-    "test": "vitest run",
-    "demo": "node scripts/demo.mjs"
+    "test": "vitest run"
   },
   "engines": { "node": ">=20.0.0" },
   "dependencies": {
-    "@motion-ppt/animation": "workspace:*",
     "@motion-ppt/core": "workspace:*",
-    "@motion-ppt/shared": "workspace:*",
-    "fast-xml-parser": "^4.5.0",
-    "jszip": "^3.10.1",
-    "pptxgenjs": "^3.12.0"
+    "@motion-ppt/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

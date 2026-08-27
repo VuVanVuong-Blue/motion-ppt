@@ -2,7 +2,7 @@ import PptxGenJS from 'pptxgenjs';
 import type { Presentation } from '@motion-ppt/core';
 import { pxToInch } from '@motion-ppt/shared';
 import type { PptxEngine } from '../pptxgenjs-types.js';
-import { writeElement } from './elements.js';
+import { flattenSlideElements, writeElement } from './elements.js';
 
 export interface WritePresentationOptions {
   /** Overrides the author written into the file metadata. */
@@ -71,7 +71,7 @@ export class PresentationWriter {
       if (slide.notes) {
         pslide.addNotes(slide.notes);
       }
-      for (const element of slide.elements) {
+      for (const element of flattenSlideElements(slide, presentation.assets, warnings)) {
         writeElement(pslide, element, { pptx, assets: presentation.assets, warnings });
       }
     }
